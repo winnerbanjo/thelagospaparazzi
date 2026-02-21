@@ -313,10 +313,13 @@ function HeroSection() {
   );
 }
 
-// Portfolio - Masonry Layout with Zero Repetition (Elite 8 for Home Page)
+// Portfolio - Masonry Layout with Progressive Loading
+const INITIAL_COUNT = 6;
+
 function BentoPortfolio() {
   const [isMobile, setIsMobile] = useState(false);
-  const portfolioRef = useRef(null);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+  const sentinelRef = useRef(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -325,11 +328,24 @@ function BentoPortfolio() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Use Elite 8 images for Home Page
-  const portfolioImages = HOME_PORTFOLIO_IMAGES;
+  // IntersectionObserver — load more as the sentinel enters the viewport
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
 
-  // Assign sizes for masonry layout
-  const portfolioItems = portfolioImages.map((src, index) => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + 4, HOME_PORTFOLIO_IMAGES.length));
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
+  const portfolioItems = HOME_PORTFOLIO_IMAGES.slice(0, visibleCount).map((src, index) => {
     const sizeIndex = index % 3;
     return {
       src,
@@ -338,7 +354,7 @@ function BentoPortfolio() {
   });
 
   return (
-    <section id="portfolio" ref={portfolioRef} style={{
+    <section id="portfolio" style={{
       padding: isMobile ? '100px 16px' : '140px 48px',
       maxWidth: '1600px',
       margin: '0 auto',
@@ -366,64 +382,49 @@ function BentoPortfolio() {
       <div style={{
         display: 'grid',
         gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))',
-        gap: '16px',
+        gap: isMobile ? '8px' : '16px',
         gridAutoRows: '10px'
       }}>
         {portfolioItems.map((item, index) => {
           const rowSpan = item.size === 'large' ? 40 : item.size === 'medium' ? 30 : 20;
           return (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ 
-                type: 'spring',
-                stiffness: 200,
-                damping: 20,
-                delay: index * 0.03
+              key={item.src}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{
+                duration: 0.55,
+                ease: 'easeOut',
+                delay: Math.min(index, 5) * 0.06
               }}
-              whileHover={{ 
-                y: -4,
-                transition: { duration: 0.3 }
-              }}
+              whileHover={{ y: -4, transition: { duration: 0.25 } }}
               style={{
                 gridRowEnd: `span ${rowSpan}`,
                 overflow: 'hidden',
                 borderRadius: '8px',
-                backgroundColor: '#FFFFFF',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                border: '1px solid rgba(0, 0, 0, 0.05)'
+                backgroundColor: 'rgba(220,220,220,0.12)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
+                border: '1px solid rgba(0,0,0,0.05)',
+                willChange: 'transform'
               }}
             >
-              <motion.div
-                whileInView={{ scale: 1.05 }}
-                viewport={{ once: false, margin: '-100px' }}
-                transition={{ duration: 0.6 }}
-                whileHover={{
-                  boxShadow: 'inset 0 0 60px rgba(255, 255, 255, 0.3)'
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  position: 'relative'
-                }}
-              >
-                <SoftMagneticImage
-                  src={item.src}
-                  alt={`Portfolio ${index + 1}`}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
-                  }}
-                />
-              </motion.div>
+              <SoftMagneticImage
+                src={item.src}
+                alt={`Portfolio ${index + 1}`}
+                loading={index < INITIAL_COUNT ? 'eager' : 'lazy'}
+                decoding="async"
+                style={{ width: '100%', height: '100%' }}
+              />
             </motion.div>
           );
         })}
       </div>
 
+      {/* Invisible sentinel that triggers loading more images */}
+      {visibleCount < HOME_PORTFOLIO_IMAGES.length && (
+        <div ref={sentinelRef} style={{ height: '1px', marginTop: '40px' }} />
+      )}
     </section>
   );
 }

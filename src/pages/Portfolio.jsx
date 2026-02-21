@@ -3,73 +3,62 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 import SafeImage from '../components/SafeImage';
 import { PORTFOLIO_ARCHIVE_IMAGES } from '../utils/images';
 
-// Soft Magnetic Image - Floating in water feel (max 5 degrees)
-function SoftMagneticImage({ src, alt, style, ...props }) {
+const INITIAL_BATCH = 12;
+const LOAD_MORE_BATCH = 10;
+
+// Magnetic tilt — disabled on mobile to save frames
+function SoftMagneticImage({ src, alt, style, loading, decoding }) {
   const ref = useRef(null);
+  const [isMobile] = useState(() => window.innerWidth < 768);
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
 
-  const springConfig = { damping: 30, stiffness: 150 };
-  const smoothX = useSpring(x, springConfig);
-  const smoothY = useSpring(y, springConfig);
-  const smoothRotateX = useSpring(rotateX, springConfig);
-  const smoothRotateY = useSpring(rotateY, springConfig);
+  const cfg = { damping: 30, stiffness: 150 };
+  const sx = useSpring(x, cfg);
+  const sy = useSpring(y, cfg);
+  const srx = useSpring(rotateX, cfg);
+  const sry = useSpring(rotateY, cfg);
 
-  const handleMouseMove = (e) => {
-    if (!ref.current) return;
-    
+  const onMove = (e) => {
+    if (isMobile || !ref.current) return;
     const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    const distanceX = e.clientX - centerX;
-    const distanceY = e.clientY - centerY;
-    
-    const maxDistance = Math.max(rect.width, rect.height);
-    const strength = 8;
-    const tiltStrength = 2.5; // Max 5 degrees total
-    
-    x.set((distanceX / maxDistance) * strength);
-    y.set((distanceY / maxDistance) * strength);
-    rotateX.set((distanceY / maxDistance) * tiltStrength);
-    rotateY.set((distanceX / maxDistance) * -tiltStrength);
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const max = Math.max(rect.width, rect.height);
+    x.set((dx / max) * 8);
+    y.set((dy / max) * 8);
+    rotateX.set((dy / max) * 2.5);
+    rotateY.set((dx / max) * -2.5);
   };
 
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-    rotateX.set(0);
-    rotateY.set(0);
+  const onLeave = () => {
+    x.set(0); y.set(0); rotateX.set(0); rotateY.set(0);
   };
 
   return (
     <motion.div
       ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      data-magnetic
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
       style={{
-        x: smoothX,
-        y: smoothY,
-        rotateX: smoothRotateX,
-        rotateY: smoothRotateY,
+        x: sx, y: sy, rotateX: srx, rotateY: sry,
         transformStyle: 'preserve-3d',
         perspective: '1000px',
-        ...style
+        width: '100%',
+        height: '100%'
       }}
     >
       <SafeImage
         src={src}
         alt={alt}
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          display: 'block'
-        }}
-        {...props}
+        loading={loading}
+        decoding={decoding}
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
       />
     </motion.div>
   );
@@ -77,19 +66,36 @@ function SoftMagneticImage({ src, alt, style, ...props }) {
 
 export default function Portfolio() {
   const [isMobile, setIsMobile] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH);
+  const sentinelRef = useRef(null);
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Full Archive - All remaining images
-  const portfolioImages = PORTFOLIO_ARCHIVE_IMAGES;
+  // Sentinel-based progressive load
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
 
-  // Assign sizes for masonry layout
-  const portfolioItems = portfolioImages.map((src, index) => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) =>
+            Math.min(prev + LOAD_MORE_BATCH, PORTFOLIO_ARCHIVE_IMAGES.length)
+          );
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [visibleCount]); // re-attach when count changes so sentinel moves
+
+  const portfolioItems = PORTFOLIO_ARCHIVE_IMAGES.slice(0, visibleCount).map((src, index) => {
     const sizeIndex = index % 3;
     return {
       src,
@@ -100,10 +106,9 @@ export default function Portfolio() {
   return (
     <div style={{ backgroundColor: '#FFFFFF', minHeight: '100vh', paddingTop: '120px' }}>
       <section style={{
-        padding: isMobile ? '100px 24px' : '140px 48px',
+        padding: isMobile ? '60px 16px 120px' : '80px 48px 160px',
         maxWidth: '1600px',
-        margin: '0 auto',
-        backgroundColor: '#FFFFFF'
+        margin: '0 auto'
       }}>
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
@@ -115,74 +120,80 @@ export default function Portfolio() {
             fontWeight: 700,
             color: '#000000',
             letterSpacing: '0.25em',
-            marginBottom: isMobile ? '60px' : '80px',
+            marginBottom: isMobile ? '48px' : '80px',
             textAlign: 'center',
             textTransform: 'uppercase'
           }}
         >
-          P O R T F O L I O  A R C H I V E
+          P O R T F O L I O &nbsp; A R C H I V E
         </motion.h1>
 
         <div style={{
           display: 'grid',
           gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '16px',
+          gap: isMobile ? '8px' : '16px',
           gridAutoRows: '10px'
         }}>
           {portfolioItems.map((item, index) => {
             const rowSpan = item.size === 'large' ? 40 : item.size === 'medium' ? 30 : 20;
             return (
               <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ 
-                  type: 'spring',
-                  stiffness: 200,
-                  damping: 20,
-                  delay: index * 0.03
+                key={item.src}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{
+                  duration: 0.5,
+                  ease: 'easeOut',
+                  delay: Math.min(index % LOAD_MORE_BATCH, 6) * 0.05
                 }}
-                whileHover={{ 
-                  y: -4,
-                  transition: { duration: 0.3 }
-                }}
+                whileHover={{ y: -4, transition: { duration: 0.25 } }}
                 style={{
                   gridRowEnd: `span ${rowSpan}`,
                   overflow: 'hidden',
                   borderRadius: '8px',
-                  backgroundColor: '#FFFFFF',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                  border: '1px solid rgba(0, 0, 0, 0.05)'
+                  backgroundColor: 'rgba(220,220,220,0.12)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
+                  border: '1px solid rgba(0,0,0,0.05)',
+                  willChange: 'transform'
                 }}
               >
-                <motion.div
-                  whileInView={{ scale: 1.05 }}
-                  viewport={{ once: false, margin: '-100px' }}
-                  transition={{ duration: 0.6 }}
-                  whileHover={{
-                    boxShadow: 'inset 0 0 60px rgba(255, 255, 255, 0.3)'
-                  }}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    position: 'relative'
-                  }}
-                >
-                  <SoftMagneticImage
-                    src={item.src}
-                    alt={`Portfolio ${index + 1}`}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover'
-                    }}
-                  />
-                </motion.div>
+                <SoftMagneticImage
+                  src={item.src}
+                  alt={`Portfolio ${index + 1}`}
+                  loading={index < INITIAL_BATCH ? 'eager' : 'lazy'}
+                  decoding="async"
+                  style={{ width: '100%', height: '100%' }}
+                />
               </motion.div>
             );
           })}
         </div>
+
+        {/* Sentinel — triggers next batch load */}
+        {visibleCount < PORTFOLIO_ARCHIVE_IMAGES.length && (
+          <div ref={sentinelRef} style={{ height: '1px', marginTop: '60px' }} />
+        )}
+
+        {/* End-of-archive label */}
+        {visibleCount >= PORTFOLIO_ARCHIVE_IMAGES.length && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: '0.625rem',
+              color: '#aaaaaa',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              textAlign: 'center',
+              marginTop: '80px'
+            }}
+          >
+            End of Archive
+          </motion.p>
+        )}
       </section>
     </div>
   );
