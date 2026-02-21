@@ -1,0 +1,126 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@theme {
+  --color-void-black: #000000;
+  --color-luxury-silver: #C0C0C0;
+  --color-regal-purple: #4B0082;
+  
+  --font-royalty: 'Cormorant Garamond', 'Playfair Display', serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+/* Tailwind utility classes for custom colors */
+@layer utilities {
+  .bg-void-black {
+    background-color: #000000;
+  }
+  .text-void-black {
+    color: #000000;
+  }
+  .bg-luxury-silver {
+    background-color: #C0C0C0;
+  }
+  .text-luxury-silver {
+    color: #C0C0C0;
+  }
+  .bg-regal-purple {
+    background-color: #4B0082;
+  }
+  .text-regal-purple {
+    color: #4B0082;
+  }
+  .border-luxury-silver {
+    border-color: #C0C0C0;
+  }
+  .border-regal-purple {
+    border-color: #4B0082;
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #FFFFFF;
+  color: #000000;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  cursor: auto !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-royalty);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.font-royalty {
+  font-family: var(--font-royalty);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F9FAFB;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Hardware acceleration for glassmorphic elements */
+.glass-effect {
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* CSS Fallbacks for glassmorphism */
+@supports not (backdrop-filter: blur(40px)) {
+  [style*="backdrop-filter"] {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+  }
+}
+
+/* Fallback for browsers without backdrop-filter support */
+@supports not (backdrop-filter: blur(20px)) {
+  .glass-navbar,
+  .glass-card,
+  .glass-button {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+  }
+}
+
+/* Smooth animations */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
