@@ -10,8 +10,7 @@ import Booking from './pages/Booking';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Refund from './pages/Refund';
-import Login from './pages/Login';
-import Courses from './components/Courses';
+import Admin from './pages/Admin';
 
 // Scroll to Top on Route Change
 function ScrollToTop() {
@@ -1360,7 +1359,7 @@ function Home() {
 // Inner app — needs to be inside BrowserRouter so useLocation works
 function AppInner() {
   const location = useLocation();
-  const isAdminRoute = location.pathname === '/login' || location.pathname === '/courses';
+  const isAdminRoute = location.pathname === '/admin' || location.pathname === '/login';
 
   return (
     <div style={{ backgroundColor: '#FFFFFF', minHeight: '100vh' }}>
@@ -1384,9 +1383,8 @@ function AppInner() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/refund" element={<Refund />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/admin" element={<Login />} />
-            <Route path="/courses" element={<Courses />} />
+            <Route path="/login" element={<Admin />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
           {!isAdminRoute && <Footer />}
         </motion.div>
