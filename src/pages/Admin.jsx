@@ -301,9 +301,6 @@ export default function Admin() {
                 Recent Bookings
               </h2>
             </div>
-            <p style={{ ...mutedStyle, maxWidth: '480px', textAlign: 'right' }}>
-              Clean overview only for now. Course controls are intentionally deferred.
-            </p>
           </div>
 
           {loadingBookings ? (
