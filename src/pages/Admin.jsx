@@ -7,54 +7,72 @@ const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'lagospaparazzi-ad
 
 const pageStyle = {
   minHeight: '100vh',
-  background: 'linear-gradient(180deg, #0d1117 0%, #111827 45%, #030712 100%)',
-  color: '#f8fafc',
-  padding: '32px 20px 80px'
+  background: 'radial-gradient(circle at top left, rgba(0,0,0,0.04), transparent 30%), linear-gradient(180deg, #ffffff 0%, #fbfbf9 100%)',
+  color: '#111111',
+  padding: '28px 20px 72px'
 };
 
 const shellStyle = {
-  maxWidth: '1180px',
+  maxWidth: '1240px',
   margin: '0 auto'
 };
 
-const cardStyle = {
-  background: 'rgba(15, 23, 42, 0.76)',
-  border: '1px solid rgba(148, 163, 184, 0.18)',
-  borderRadius: '24px',
-  backdropFilter: 'blur(18px)',
-  boxShadow: '0 24px 80px rgba(2, 6, 23, 0.35)'
+const panelStyle = {
+  background: 'rgba(255,255,255,0.82)',
+  border: '1px solid rgba(0,0,0,0.08)',
+  borderRadius: '28px',
+  boxShadow: '0 18px 50px rgba(0,0,0,0.06)',
+  backdropFilter: 'blur(12px)'
 };
 
 const inputStyle = {
   width: '100%',
-  background: 'rgba(15, 23, 42, 0.9)',
-  color: '#f8fafc',
-  border: '1px solid rgba(148, 163, 184, 0.25)',
-  borderRadius: '16px',
+  background: 'rgba(255,255,255,0.95)',
+  color: '#111111',
+  border: '1px solid rgba(0,0,0,0.12)',
+  borderRadius: '18px',
   padding: '16px 18px',
   outline: 'none',
   fontSize: '1rem'
 };
 
-const buttonStyle = {
-  background: '#f8fafc',
-  color: '#0f172a',
+const primaryButtonStyle = {
+  background: '#111111',
+  color: '#ffffff',
   border: 'none',
   borderRadius: '999px',
-  padding: '14px 22px',
+  padding: '14px 24px',
   fontWeight: 700,
   cursor: 'pointer'
 };
 
+const secondaryButtonStyle = {
+  background: 'transparent',
+  color: '#111111',
+  border: '1px solid rgba(0,0,0,0.14)',
+  borderRadius: '999px',
+  padding: '14px 24px',
+  fontWeight: 600,
+  cursor: 'pointer'
+};
+
+const eyebrowStyle = {
+  fontFamily: "'Inter', system-ui, sans-serif",
+  fontSize: '0.74rem',
+  letterSpacing: '0.28em',
+  textTransform: 'uppercase',
+  color: 'rgba(17,17,17,0.54)'
+};
+
 const mutedStyle = {
-  color: 'rgba(226, 232, 240, 0.68)'
+  color: 'rgba(17,17,17,0.62)'
 };
 
 const statusStyles = {
-  pending: { background: 'rgba(245, 158, 11, 0.14)', color: '#fbbf24' },
-  confirmed: { background: 'rgba(34, 197, 94, 0.14)', color: '#4ade80' },
-  completed: { background: 'rgba(56, 189, 248, 0.14)', color: '#38bdf8' },
-  cancelled: { background: 'rgba(248, 113, 113, 0.14)', color: '#f87171' }
+  pending: { background: '#f6efe2', color: '#8a5a00' },
+  confirmed: { background: '#e9f7ef', color: '#1f6b44' },
+  completed: { background: '#edf5fb', color: '#245c8f' },
+  cancelled: { background: '#fbeaea', color: '#9f3131' }
 };
 
 function formatDate(value) {
@@ -69,30 +87,56 @@ function formatDate(value) {
   }).format(date);
 }
 
+function formatCurrency(value) {
+  if (!value) return 'Not set';
+  return `₦${Number(value).toLocaleString('en-NG')}`;
+}
+
+function MetricCard({ label, value, note }) {
+  return (
+    <div style={{ ...panelStyle, padding: '22px 22px 20px' }}>
+      <div style={{ ...eyebrowStyle, marginBottom: '16px' }}>{label}</div>
+      <div style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', lineHeight: 1, fontWeight: 700, fontFamily: "'Cormorant Garamond', serif", marginBottom: '8px' }}>
+        {value}
+      </div>
+      <div style={{ ...mutedStyle, fontSize: '0.95rem' }}>{note}</div>
+    </div>
+  );
+}
+
+function EmptyState({ title, body }) {
+  return (
+    <div style={{ ...panelStyle, padding: '48px 28px', textAlign: 'center', borderStyle: 'dashed' }}>
+      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2rem', marginBottom: '10px', fontWeight: 600 }}>
+        {title}
+      </h3>
+      <p style={{ ...mutedStyle, maxWidth: '460px', margin: '0 auto' }}>{body}</p>
+    </div>
+  );
+}
+
 function AdminLogin({ password, setPassword, error, onSubmit }) {
   return (
     <div style={pageStyle}>
-      <div style={{ ...shellStyle, maxWidth: '520px', paddingTop: '8vh' }}>
+      <div style={{ ...shellStyle, maxWidth: '620px', paddingTop: '8vh' }}>
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          style={{ ...cardStyle, padding: '32px' }}
+          style={{ ...panelStyle, padding: '40px 34px' }}
         >
-          <div style={{ marginBottom: '24px' }}>
-            <p style={{ ...mutedStyle, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: '0.78rem', marginBottom: '12px' }}>
-              Lagos Paparazzi Admin
-            </p>
-            <h1 style={{ fontSize: 'clamp(2.2rem, 6vw, 3.5rem)', lineHeight: 1, marginBottom: '12px', fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800 }}>
-              Private Access
+          <div style={{ marginBottom: '30px' }}>
+            <div style={{ ...eyebrowStyle, marginBottom: '16px' }}>Private Admin</div>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(3rem, 9vw, 4.9rem)', lineHeight: 0.92, marginBottom: '14px', fontWeight: 600 }}>
+              Bookings
             </h1>
-            <p style={mutedStyle}>
-              Use the admin password to open bookings. This page is separate from the public website.
+            <p style={{ ...mutedStyle, fontSize: '1rem', maxWidth: '420px' }}>
+              A clean private view for checking requests without affecting the public website.
             </p>
           </div>
 
           <form onSubmit={onSubmit}>
-            <label htmlFor="admin-password" style={{ display: 'block', marginBottom: '10px', fontSize: '0.95rem', color: '#cbd5e1' }}>
+            <label htmlFor="admin-password" style={{ display: 'block', marginBottom: '10px', fontSize: '0.92rem', color: 'rgba(17,17,17,0.72)' }}>
               Password
             </label>
             <input
@@ -100,18 +144,18 @@ function AdminLogin({ password, setPassword, error, onSubmit }) {
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Enter admin password"
+              placeholder="Enter password"
               style={inputStyle}
             />
 
             {error ? (
-              <div style={{ marginTop: '14px', borderRadius: '14px', padding: '12px 14px', background: 'rgba(127, 29, 29, 0.35)', border: '1px solid rgba(248, 113, 113, 0.25)', color: '#fecaca' }}>
+              <div style={{ marginTop: '14px', borderRadius: '16px', padding: '12px 14px', background: '#fbefef', border: '1px solid rgba(159,49,49,0.12)', color: '#9f3131' }}>
                 {error}
               </div>
             ) : null}
 
-            <button type="submit" style={{ ...buttonStyle, marginTop: '18px', width: '100%' }}>
-              Enter Admin
+            <button type="submit" style={{ ...primaryButtonStyle, marginTop: '18px', width: '100%' }}>
+              Enter
             </button>
           </form>
         </motion.div>
@@ -125,9 +169,7 @@ export default function Admin() {
   const [error, setError] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [bookings, setBookings] = useState([]);
-  const [courses, setCourses] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
-  const [loadingCourses, setLoadingCourses] = useState(true);
   const [dataError, setDataError] = useState('');
 
   useEffect(() => {
@@ -137,36 +179,22 @@ export default function Admin() {
   useEffect(() => {
     if (!isAuthorized) return;
 
-    const fetchAdminData = async () => {
+    const fetchBookings = async () => {
       setDataError('');
       setLoadingBookings(true);
-      setLoadingCourses(true);
 
       try {
-        const [bookingsResponse, coursesResponse] = await Promise.allSettled([
-          api.get('/booking'),
-          api.get('/courses/public')
-        ]);
-
-        if (bookingsResponse.status === 'fulfilled') {
-          setBookings(bookingsResponse.value.data?.data || []);
-        } else {
-          setBookings([]);
-          setDataError('Bookings could not be loaded. Check that the API is online and `VITE_API_URL` points to it.');
-        }
-
-        if (coursesResponse.status === 'fulfilled') {
-          setCourses(coursesResponse.value.data?.data || []);
-        } else {
-          setCourses([]);
-        }
+        const response = await api.get('/booking');
+        setBookings(response.data?.data || []);
+      } catch {
+        setBookings([]);
+        setDataError('Bookings are not loading right now. The admin page is up, but the API connection needs attention.');
       } finally {
         setLoadingBookings(false);
-        setLoadingCourses(false);
       }
     };
 
-    fetchAdminData();
+    fetchBookings();
   }, [isAuthorized]);
 
   const handleLogin = (event) => {
@@ -199,155 +227,145 @@ export default function Admin() {
     );
   }
 
+  const pendingCount = bookings.filter((booking) => booking.status === 'pending').length;
+  const latestBooking = bookings[0];
+
   return (
     <div style={pageStyle}>
       <div style={shellStyle}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start', marginBottom: '28px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '18px', alignItems: 'flex-start', marginBottom: '28px', flexWrap: 'wrap' }}>
           <div>
-            <p style={{ ...mutedStyle, textTransform: 'uppercase', letterSpacing: '0.22em', fontSize: '0.78rem', marginBottom: '10px' }}>
-              Admin Dashboard
-            </p>
-            <h1 style={{ fontSize: 'clamp(2.3rem, 6vw, 4.4rem)', lineHeight: 0.95, marginBottom: '12px', fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800 }}>
-              Bookings First
+            <div style={{ ...eyebrowStyle, marginBottom: '16px' }}>Admin Dashboard</div>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(3rem, 10vw, 5.5rem)', lineHeight: 0.9, marginBottom: '14px', fontWeight: 600 }}>
+              Booking Desk
             </h1>
-            <p style={{ ...mutedStyle, maxWidth: '760px' }}>
-              Separate admin area for incoming bookings. Courses are shown as a lightweight preview for now.
+            <p style={{ ...mutedStyle, maxWidth: '650px', fontSize: '1rem' }}>
+              A quieter private view for tracking incoming requests. Course management can be added later without touching the public website.
             </p>
           </div>
 
-          <button onClick={handleLogout} style={buttonStyle}>
+          <button onClick={handleLogout} style={secondaryButtonStyle}>
             Log Out
           </button>
         </div>
 
         {dataError ? (
-          <div style={{ ...cardStyle, padding: '16px 18px', marginBottom: '22px', color: '#fecaca', borderColor: 'rgba(248, 113, 113, 0.2)' }}>
+          <div style={{ ...panelStyle, padding: '18px 20px', marginBottom: '20px', color: '#8c3a3a', background: '#fff8f7' }}>
             {dataError}
           </div>
         ) : null}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '22px' }}>
-          <div style={{ ...cardStyle, padding: '20px' }}>
-            <p style={{ ...mutedStyle, marginBottom: '6px' }}>Total bookings</p>
-            <div style={{ fontSize: '2rem', fontWeight: 800 }}>{loadingBookings ? '...' : bookings.length}</div>
-          </div>
-          <div style={{ ...cardStyle, padding: '20px' }}>
-            <p style={{ ...mutedStyle, marginBottom: '6px' }}>Pending</p>
-            <div style={{ fontSize: '2rem', fontWeight: 800 }}>
-              {loadingBookings ? '...' : bookings.filter((booking) => booking.status === 'pending').length}
-            </div>
-          </div>
-          <div style={{ ...cardStyle, padding: '20px' }}>
-            <p style={{ ...mutedStyle, marginBottom: '6px' }}>Published courses</p>
-            <div style={{ fontSize: '2rem', fontWeight: 800 }}>{loadingCourses ? '...' : courses.length}</div>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+          <MetricCard
+            label="Total Bookings"
+            value={loadingBookings ? '...' : bookings.length}
+            note="All requests received so far."
+          />
+          <MetricCard
+            label="Pending"
+            value={loadingBookings ? '...' : pendingCount}
+            note="Requests still waiting for a response."
+          />
+          <MetricCard
+            label="Courses"
+            value="Soon"
+            note="Course tools will be added here later."
+          />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(280px, 0.9fr)', gap: '18px' }}>
-          <section style={{ ...cardStyle, padding: '22px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap' }}>
+        {latestBooking ? (
+          <section style={{ ...panelStyle, padding: '24px', marginBottom: '22px', overflow: 'hidden', position: 'relative' }}>
+            <div style={{ position: 'absolute', right: '-40px', top: '-40px', width: '180px', height: '180px', borderRadius: '999px', background: 'rgba(0,0,0,0.03)' }} />
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', gap: '18px', flexWrap: 'wrap' }}>
               <div>
-                <h2 style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: '1.35rem', fontWeight: 700, marginBottom: '4px' }}>Recent bookings</h2>
-                <p style={mutedStyle}>Latest requests from the website booking form.</p>
+                <div style={{ ...eyebrowStyle, marginBottom: '12px' }}>Latest Request</div>
+                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.2rem', marginBottom: '8px', fontWeight: 600 }}>
+                  {latestBooking.name}
+                </h2>
+                <p style={mutedStyle}>
+                  {latestBooking.eventType} • {formatDate(latestBooking.eventDate)} • {latestBooking.location || 'Location not set'}
+                </p>
               </div>
-            </div>
-
-            <div style={{ display: 'grid', gap: '14px' }}>
-              {loadingBookings ? (
-                <div style={{ ...mutedStyle, padding: '12px 0' }}>Loading bookings...</div>
-              ) : bookings.length === 0 ? (
-                <div style={{ ...mutedStyle, padding: '12px 0' }}>No bookings found.</div>
-              ) : (
-                bookings.map((booking) => {
-                  const statusStyle = statusStyles[booking.status] || statusStyles.pending;
-                  return (
-                    <article
-                      key={booking._id}
-                      style={{
-                        border: '1px solid rgba(148, 163, 184, 0.14)',
-                        borderRadius: '18px',
-                        padding: '18px',
-                        background: 'rgba(15, 23, 42, 0.5)'
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                        <div>
-                          <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '4px', fontFamily: "'Inter', system-ui, sans-serif" }}>{booking.name}</h3>
-                          <p style={mutedStyle}>{booking.eventType} • {formatDate(booking.eventDate)}</p>
-                        </div>
-                        <div style={{ alignSelf: 'flex-start', padding: '7px 11px', borderRadius: '999px', fontSize: '0.84rem', fontWeight: 700, ...statusStyle }}>
-                          {booking.status || 'pending'}
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '10px' }}>
-                        <div>
-                          <div style={mutedStyle}>Email</div>
-                          <div>{booking.email || 'N/A'}</div>
-                        </div>
-                        <div>
-                          <div style={mutedStyle}>Phone</div>
-                          <div>{booking.phone || 'N/A'}</div>
-                        </div>
-                        <div>
-                          <div style={mutedStyle}>Location</div>
-                          <div>{booking.location || 'N/A'}</div>
-                        </div>
-                        <div>
-                          <div style={mutedStyle}>Budget</div>
-                          <div>{booking.budget ? `₦${Number(booking.budget).toLocaleString('en-NG')}` : 'Not set'}</div>
-                        </div>
-                      </div>
-
-                      {(booking.message || booking.specialRequirements) ? (
-                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(148, 163, 184, 0.12)' }}>
-                          <div style={mutedStyle}>Notes</div>
-                          <div>{booking.message || booking.specialRequirements}</div>
-                        </div>
-                      ) : null}
-                    </article>
-                  );
-                })
-              )}
+              <div style={{ alignSelf: 'flex-start', padding: '8px 12px', borderRadius: '999px', fontSize: '0.84rem', fontWeight: 700, ...(statusStyles[latestBooking.status] || statusStyles.pending) }}>
+                {latestBooking.status || 'pending'}
+              </div>
             </div>
           </section>
+        ) : null}
 
-          <aside style={{ display: 'grid', gap: '18px' }}>
-            <section style={{ ...cardStyle, padding: '22px' }}>
-              <h2 style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px' }}>Courses</h2>
-              <p style={{ ...mutedStyle, marginBottom: '14px' }}>
-                Public course preview for now. If you want full course management next, that should be done with proper backend admin auth.
-              </p>
+        <section>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '18px', alignItems: 'end', marginBottom: '14px', flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ ...eyebrowStyle, marginBottom: '10px' }}>Requests</div>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.3rem', fontWeight: 600 }}>
+                Recent Bookings
+              </h2>
+            </div>
+            <p style={{ ...mutedStyle, maxWidth: '480px', textAlign: 'right' }}>
+              Clean overview only for now. Course controls are intentionally deferred.
+            </p>
+          </div>
 
-              <div style={{ display: 'grid', gap: '10px' }}>
-                {loadingCourses ? (
-                  <div style={mutedStyle}>Loading courses...</div>
-                ) : courses.length === 0 ? (
-                  <div style={mutedStyle}>No published courses found.</div>
-                ) : (
-                  courses.slice(0, 5).map((course) => (
-                    <div key={course._id} style={{ border: '1px solid rgba(148, 163, 184, 0.14)', borderRadius: '16px', padding: '14px' }}>
-                      <div style={{ fontWeight: 700, marginBottom: '4px' }}>{course.title}</div>
-                      <div style={{ ...mutedStyle, fontSize: '0.94rem' }}>
-                        {course.level || 'Course'} • {course.duration || 'Duration not set'}
+          {loadingBookings ? (
+            <EmptyState title="Loading bookings" body="Fetching the latest requests from the API." />
+          ) : bookings.length === 0 ? (
+            <EmptyState title="No bookings yet" body="New booking requests will appear here as they come in from the website." />
+          ) : (
+            <div style={{ display: 'grid', gap: '14px' }}>
+              {bookings.map((booking, index) => (
+                <motion.article
+                  key={booking._id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.28, delay: index * 0.03 }}
+                  style={{ ...panelStyle, padding: '22px' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                    <div>
+                      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.85rem', lineHeight: 1, marginBottom: '8px', fontWeight: 600 }}>
+                        {booking.name}
+                      </h3>
+                      <p style={mutedStyle}>
+                        {booking.eventType} • {formatDate(booking.eventDate)}
+                      </p>
+                    </div>
+                    <div style={{ alignSelf: 'flex-start', padding: '8px 12px', borderRadius: '999px', fontSize: '0.84rem', fontWeight: 700, ...(statusStyles[booking.status] || statusStyles.pending) }}>
+                      {booking.status || 'pending'}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '10px' }}>
+                    <div>
+                      <div style={eyebrowStyle}>Email</div>
+                      <div style={{ marginTop: '6px' }}>{booking.email || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div style={eyebrowStyle}>Phone</div>
+                      <div style={{ marginTop: '6px' }}>{booking.phone || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div style={eyebrowStyle}>Location</div>
+                      <div style={{ marginTop: '6px' }}>{booking.location || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div style={eyebrowStyle}>Budget</div>
+                      <div style={{ marginTop: '6px' }}>{formatCurrency(booking.budget)}</div>
+                    </div>
+                  </div>
+
+                  {(booking.message || booking.specialRequirements) ? (
+                    <div style={{ marginTop: '14px', paddingTop: '14px', borderTop: '1px solid rgba(0,0,0,0.08)' }}>
+                      <div style={eyebrowStyle}>Notes</div>
+                      <div style={{ marginTop: '8px', ...mutedStyle, color: '#1a1a1a' }}>
+                        {booking.message || booking.specialRequirements}
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-            </section>
-
-            <section style={{ ...cardStyle, padding: '22px' }}>
-              <h2 style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px' }}>Password</h2>
-              <p style={{ ...mutedStyle, marginBottom: '10px' }}>
-                This admin gate is frontend-only for now.
-              </p>
-              <p style={mutedStyle}>
-                Set `VITE_ADMIN_PASSWORD` in Vercel to replace the fallback password before relying on this in production.
-              </p>
-            </section>
-          </aside>
-        </div>
+                  ) : null}
+                </motion.article>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
