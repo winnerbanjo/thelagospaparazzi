@@ -1385,6 +1385,7 @@ function AppInner() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/refund" element={<Refund />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={<Login />} />
             <Route path="/courses" element={<Courses />} />
           </Routes>
           {!isAdminRoute && <Footer />}
