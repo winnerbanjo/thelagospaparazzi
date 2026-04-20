@@ -169,7 +169,9 @@ export default function Admin() {
   const [error, setError] = useState('');
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [bookings, setBookings] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
+  const [loadingApplications, setLoadingApplications] = useState(true);
   const [dataError, setDataError] = useState('');
 
   useEffect(() => {
@@ -179,22 +181,43 @@ export default function Admin() {
   useEffect(() => {
     if (!isAuthorized) return;
 
-    const fetchBookings = async () => {
+    const fetchAdminData = async () => {
       setDataError('');
       setLoadingBookings(true);
+      setLoadingApplications(true);
 
       try {
-        const response = await api.get('/booking');
-        setBookings(response.data?.data || []);
+        const [bookingResponse, applicationResponse] = await Promise.allSettled([
+          api.get('/booking'),
+          api.get('/masterclass-applications')
+        ]);
+
+        if (bookingResponse.status === 'fulfilled') {
+          setBookings(bookingResponse.value.data?.data || []);
+        } else {
+          setBookings([]);
+        }
+
+        if (applicationResponse.status === 'fulfilled') {
+          setApplications(applicationResponse.value.data?.data || []);
+        } else {
+          setApplications([]);
+        }
+
+        if (bookingResponse.status === 'rejected' || applicationResponse.status === 'rejected') {
+          setDataError('Some admin data is not loading right now. The dashboard is up, but one or more API connections need attention.');
+        }
       } catch {
         setBookings([]);
-        setDataError('Bookings are not loading right now. The admin page is up, but the API connection needs attention.');
+        setApplications([]);
+        setDataError('Admin data is not loading right now. The dashboard is up, but the API connection needs attention.');
       } finally {
         setLoadingBookings(false);
+        setLoadingApplications(false);
       }
     };
 
-    fetchBookings();
+    fetchAdminData();
   }, [isAuthorized]);
 
   const handleLogin = (event) => {
@@ -229,6 +252,7 @@ export default function Admin() {
 
   const pendingCount = bookings.filter((booking) => booking.status === 'pending').length;
   const latestBooking = bookings[0];
+  const latestApplication = applications[0];
 
   return (
     <div style={pageStyle}>
@@ -271,6 +295,11 @@ export default function Admin() {
             value="Soon"
             note="Course tools will be added here later."
           />
+          <MetricCard
+            label="Masterclass Students"
+            value={loadingApplications ? '...' : applications.length}
+            note="Private class applications received."
+          />
         </div>
 
         {latestBooking ? (
@@ -288,6 +317,26 @@ export default function Admin() {
               </div>
               <div style={{ alignSelf: 'flex-start', padding: '8px 12px', borderRadius: '999px', fontSize: '0.84rem', fontWeight: 700, ...(statusStyles[latestBooking.status] || statusStyles.pending) }}>
                 {latestBooking.status || 'pending'}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {latestApplication ? (
+          <section style={{ ...panelStyle, padding: '24px', marginBottom: '22px', overflow: 'hidden', position: 'relative' }}>
+            <div style={{ position: 'absolute', left: '-30px', bottom: '-36px', width: '150px', height: '150px', borderRadius: '999px', background: 'rgba(0,0,0,0.03)' }} />
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', gap: '18px', flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ ...eyebrowStyle, marginBottom: '12px' }}>Latest Masterclass Application</div>
+                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.2rem', marginBottom: '8px', fontWeight: 600 }}>
+                  {latestApplication.fullName}
+                </h2>
+                <p style={mutedStyle}>
+                  {latestApplication.currentLevel} • {latestApplication.instagramHandle} • {formatDate(latestApplication.createdAt)}
+                </p>
+              </div>
+              <div style={{ alignSelf: 'flex-start', padding: '8px 12px', borderRadius: '999px', fontSize: '0.84rem', fontWeight: 700, background: latestApplication.paymentConfirmed ? '#e9f7ef' : '#f6efe2', color: latestApplication.paymentConfirmed ? '#1f6b44' : '#8a5a00' }}>
+                {latestApplication.paymentConfirmed ? 'payment marked' : 'payment pending'}
               </div>
             </div>
           </section>
@@ -358,6 +407,95 @@ export default function Admin() {
                       </div>
                     </div>
                   ) : null}
+                </motion.article>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section style={{ marginTop: '28px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '18px', alignItems: 'end', marginBottom: '14px', flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ ...eyebrowStyle, marginBottom: '10px' }}>Students</div>
+              <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2.3rem', fontWeight: 600 }}>
+                Masterclass Applications
+              </h2>
+            </div>
+          </div>
+
+          {loadingApplications ? (
+            <EmptyState title="Loading applications" body="Fetching all registered students for the masterclass." />
+          ) : applications.length === 0 ? (
+            <EmptyState title="No applications yet" body="Private class applications will appear here as students register." />
+          ) : (
+            <div style={{ display: 'grid', gap: '14px' }}>
+              {applications.map((application, index) => (
+                <motion.article
+                  key={application._id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.28, delay: index * 0.03 }}
+                  style={{ ...panelStyle, padding: '22px' }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                    <div>
+                      <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.85rem', lineHeight: 1, marginBottom: '8px', fontWeight: 600 }}>
+                        {application.fullName}
+                      </h3>
+                      <p style={mutedStyle}>
+                        {application.currentLevel} • {application.instagramHandle} • {formatDate(application.createdAt)}
+                      </p>
+                    </div>
+                    <div style={{ alignSelf: 'flex-start', padding: '8px 12px', borderRadius: '999px', fontSize: '0.84rem', fontWeight: 700, background: application.paymentConfirmed ? '#e9f7ef' : '#f6efe2', color: application.paymentConfirmed ? '#1f6b44' : '#8a5a00' }}>
+                      {application.paymentConfirmed ? 'payment marked' : 'payment pending'}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '10px' }}>
+                    <div>
+                      <div style={eyebrowStyle}>Email</div>
+                      <div style={{ marginTop: '6px' }}>{application.email || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div style={eyebrowStyle}>Phone</div>
+                      <div style={{ marginTop: '6px' }}>{application.phone || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div style={eyebrowStyle}>Device</div>
+                      <div style={{ marginTop: '6px' }}>{application.deviceInUse || 'N/A'}</div>
+                    </div>
+                    <div>
+                      <div style={eyebrowStyle}>Transfer Ref</div>
+                      <div style={{ marginTop: '6px' }}>{application.transferReference || 'Not provided'}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gap: '12px', marginTop: '14px', paddingTop: '14px', borderTop: '1px solid rgba(0,0,0,0.08)' }}>
+                    <div>
+                      <div style={eyebrowStyle}>What drew them to the class</div>
+                      <div style={{ marginTop: '8px', ...mutedStyle, color: '#1a1a1a' }}>
+                        {application.attractionReason}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={eyebrowStyle}>Current limitation</div>
+                      <div style={{ marginTop: '8px', ...mutedStyle, color: '#1a1a1a' }}>
+                        {application.currentLimitation}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={eyebrowStyle}>Expected result</div>
+                      <div style={{ marginTop: '8px', ...mutedStyle, color: '#1a1a1a' }}>
+                        {application.expectedResult}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={eyebrowStyle}>Commitment</div>
+                      <div style={{ marginTop: '8px', ...mutedStyle, color: '#1a1a1a' }}>
+                        {application.commitmentStatus}
+                      </div>
+                    </div>
+                  </div>
                 </motion.article>
               ))}
             </div>
