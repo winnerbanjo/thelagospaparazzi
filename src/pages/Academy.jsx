@@ -127,9 +127,16 @@ export default function Academy() {
     }
   };
 
+  const scrollToApplication = () => {
+    const target = document.getElementById('masterclass-application');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingTop: '120px' }}>
-      <section style={{ ...sectionWidth, paddingTop: '48px', paddingBottom: '72px' }}>
+    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingTop: isMobile ? '96px' : '120px', paddingBottom: isMobile ? '110px' : '0' }}>
+      <section style={{ ...sectionWidth, paddingTop: isMobile ? '20px' : '48px', paddingBottom: '72px' }}>
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
@@ -154,25 +161,67 @@ export default function Academy() {
             </p>
             <h1 style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 'clamp(3rem, 7vw, 6.4rem)',
-              lineHeight: 0.9,
+              fontSize: isMobile ? 'clamp(2.8rem, 13vw, 4.25rem)' : 'clamp(3rem, 7vw, 6.4rem)',
+              lineHeight: isMobile ? 0.96 : 0.9,
               letterSpacing: '-0.05em',
               color: '#000000',
               marginBottom: '22px',
-              fontWeight: 800
+              fontWeight: 800,
+              maxWidth: isMobile ? '9ch' : 'none'
             }}>
               The Million Dollar Photo Masterclass
             </h1>
             <p style={{
               fontFamily: "'Playfair Display', serif",
-              fontSize: '1.04rem',
-              lineHeight: 1.9,
+              fontSize: isMobile ? '0.98rem' : '1.04rem',
+              lineHeight: isMobile ? 1.8 : 1.9,
               color: '#353535',
               maxWidth: '650px',
               marginBottom: '30px'
             }}>
               A focused, high-standard private class for photographers who want magazine-level results, stronger direction, sharper lighting choices, and a more refined creative process.
             </p>
+
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '30px' }}>
+              <button
+                type="button"
+                onClick={scrollToApplication}
+                style={{
+                  padding: isMobile ? '16px 20px' : '16px 26px',
+                  backgroundColor: '#000000',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '999px',
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer'
+                }}
+              >
+                Register Now
+              </button>
+              <button
+                type="button"
+                onClick={scrollToApplication}
+                style={{
+                  padding: isMobile ? '16px 20px' : '16px 26px',
+                  backgroundColor: '#ffffff',
+                  color: '#111111',
+                  border: '1px solid rgba(0, 0, 0, 0.14)',
+                  borderRadius: '999px',
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer'
+                }}
+              >
+                Apply for Seat
+              </button>
+            </div>
 
             <div style={{
               display: 'grid',
@@ -319,7 +368,7 @@ export default function Academy() {
             </div>
           </div>
 
-          <div style={{
+          <div id="masterclass-application" style={{
             border: '1px solid rgba(0, 0, 0, 0.1)',
             padding: '36px',
             backgroundColor: '#ffffff'
@@ -472,6 +521,43 @@ export default function Academy() {
           </div>
         </div>
       </section>
+
+      {isMobile ? (
+        <div style={{
+          position: 'fixed',
+          left: '16px',
+          right: '16px',
+          bottom: '16px',
+          zIndex: 40,
+          padding: '10px',
+          border: '1px solid rgba(0,0,0,0.08)',
+          borderRadius: '999px',
+          backgroundColor: 'rgba(255,255,255,0.94)',
+          boxShadow: '0 14px 35px rgba(0,0,0,0.08)',
+          backdropFilter: 'blur(16px)'
+        }}>
+          <button
+            type="button"
+            onClick={scrollToApplication}
+            style={{
+              width: '100%',
+              padding: '16px 18px',
+              border: 'none',
+              borderRadius: '999px',
+              backgroundColor: '#000000',
+              color: '#ffffff',
+              fontFamily: "'Playfair Display', serif",
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              cursor: 'pointer'
+            }}
+          >
+            Register for Masterclass
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
