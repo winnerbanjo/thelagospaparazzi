@@ -70,6 +70,29 @@ function InputBase({ as = 'input', style, ...props }) {
   );
 }
 
+function TextAction({ children, onClick, style }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+        fontFamily: "'Playfair Display', serif",
+        fontSize: '0.9rem',
+        color: '#111111',
+        textDecoration: 'underline',
+        textUnderlineOffset: '6px',
+        ...style
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function Academy() {
   const [isMobile, setIsMobile] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
@@ -182,12 +205,12 @@ export default function Academy() {
               A focused, high-standard private class for photographers who want magazine-level results, stronger direction, sharper lighting choices, and a more refined creative process.
             </p>
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '30px' }}>
+            <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '34px' }}>
               <button
                 type="button"
                 onClick={scrollToApplication}
                 style={{
-                  padding: isMobile ? '16px 20px' : '16px 26px',
+                  padding: isMobile ? '16px 22px' : '17px 28px',
                   backgroundColor: '#000000',
                   color: '#ffffff',
                   border: 'none',
@@ -202,25 +225,9 @@ export default function Academy() {
               >
                 Register Now
               </button>
-              <button
-                type="button"
-                onClick={scrollToApplication}
-                style={{
-                  padding: isMobile ? '16px 20px' : '16px 26px',
-                  backgroundColor: '#ffffff',
-                  color: '#111111',
-                  border: '1px solid rgba(0, 0, 0, 0.14)',
-                  borderRadius: '999px',
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer'
-                }}
-              >
-                Apply for Seat
-              </button>
+              <TextAction onClick={scrollToApplication}>
+                Go straight to application
+              </TextAction>
             </div>
 
             <div style={{
@@ -300,6 +307,13 @@ export default function Academy() {
                 </motion.div>
               ))}
             </div>
+            {!isMobile ? (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '18px' }}>
+                <TextAction onClick={scrollToApplication} style={{ letterSpacing: '0.12em', textTransform: 'uppercase', fontSize: '0.74rem' }}>
+                  Register for the class
+                </TextAction>
+              </div>
+            ) : null}
           </div>
         </motion.div>
       </section>
@@ -364,13 +378,18 @@ export default function Academy() {
               lineHeight: 1.8,
               color: '#444'
             }}>
-              Only 20 seats are available. Applications are reviewed carefully to maintain the standard of the room.
+              <div style={{ marginBottom: '16px' }}>
+                Only 20 seats are available. Applications are reviewed carefully to maintain the standard of the room.
+              </div>
+              <TextAction onClick={scrollToApplication} style={{ fontSize: '0.82rem', letterSpacing: '0.16em', textTransform: 'uppercase' }}>
+                Fill the application form
+              </TextAction>
             </div>
           </div>
 
           <div id="masterclass-application" style={{
             border: '1px solid rgba(0, 0, 0, 0.1)',
-            padding: '36px',
+            padding: isMobile ? '28px 22px' : '36px',
             backgroundColor: '#ffffff'
           }}>
             <div style={{ marginBottom: '28px' }}>
@@ -394,6 +413,17 @@ export default function Academy() {
               }}>
                 Private Class Application
               </h2>
+              <p style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: '0.98rem',
+                lineHeight: 1.8,
+                color: '#4a4a4a',
+                maxWidth: '620px',
+                marginTop: '12px',
+                marginBottom: 0
+              }}>
+                Complete the form below to apply. After payment, include your transfer reference so your seat can be reviewed quickly.
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '24px' }}>
