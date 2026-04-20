@@ -186,10 +186,16 @@ function GlassNavbar() {
         left: 0,
         right: 0,
         zIndex: 1000,
-        padding: isMobile ? '18px 18px' : '28px 48px',
+        padding: isMobile ? '14px 14px' : '28px 48px',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        backgroundColor: onHero ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.72)',
+        backgroundColor: isMobile
+          ? onHero
+            ? 'rgba(0,0,0,0.28)'
+            : 'rgba(255,255,255,0.92)'
+          : onHero
+            ? 'rgba(0,0,0,0.18)'
+            : 'rgba(255,255,255,0.72)',
         borderBottom: `1px solid ${borderColor}`,
         transition: 'background-color 0.4s ease, color 0.4s ease'
       }}
@@ -199,7 +205,8 @@ function GlassNavbar() {
         justifyContent: 'space-between',
         alignItems: 'center',
         maxWidth: '1600px',
-        margin: '0 auto'
+        margin: '0 auto',
+        minHeight: isMobile ? '44px' : 'auto'
       }}>
         {isMobile ? (
           <>
@@ -226,16 +233,18 @@ function GlassNavbar() {
                 whileHover={{ scale: 1.02 }}
                 style={{
                   fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: '1.25rem',
-                  fontWeight: 900,
+                  fontSize: '0.95rem',
+                  fontWeight: 800,
                   color: textColor,
-                  letterSpacing: '-0.03em',
+                  letterSpacing: '0.12em',
                   lineHeight: 1,
                   transition: 'color 0.4s ease',
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                THE LAGOS PAPARAZZI
+                TLP
               </motion.div>
             </Link>
 
