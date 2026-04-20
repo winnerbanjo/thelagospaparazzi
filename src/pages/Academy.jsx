@@ -159,7 +159,7 @@ export default function Academy() {
 
   return (
     <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', paddingTop: isMobile ? '96px' : '120px', paddingBottom: isMobile ? '110px' : '0' }}>
-      <section style={{ ...sectionWidth, paddingTop: isMobile ? '20px' : '48px', paddingBottom: '72px' }}>
+      <section style={{ ...sectionWidth, paddingTop: isMobile ? '8px' : '48px', paddingBottom: '72px' }}>
         <motion.div
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
@@ -171,52 +171,66 @@ export default function Academy() {
             alignItems: 'start'
           }}
         >
-          <div>
+          <div style={{ textAlign: isMobile ? 'center' : 'left' }}>
             <p style={{
               fontFamily: "'Playfair Display', serif",
-              fontSize: '0.78rem',
+              fontSize: isMobile ? '0.72rem' : '0.78rem',
               letterSpacing: '0.26em',
               textTransform: 'uppercase',
               color: 'rgba(0, 0, 0, 0.55)',
-              marginBottom: '16px'
+              marginBottom: isMobile ? '12px' : '16px'
             }}>
               Private Class Application
             </p>
             <h1 style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: isMobile ? 'clamp(2.8rem, 13vw, 4.25rem)' : 'clamp(3rem, 7vw, 6.4rem)',
-              lineHeight: isMobile ? 0.96 : 0.9,
+              fontSize: isMobile ? 'clamp(2.45rem, 11vw, 3.5rem)' : 'clamp(3rem, 7vw, 6.4rem)',
+              lineHeight: isMobile ? 0.9 : 0.9,
               letterSpacing: '-0.05em',
               color: '#000000',
-              marginBottom: '22px',
+              marginBottom: isMobile ? '16px' : '22px',
               fontWeight: 800,
-              maxWidth: isMobile ? '9ch' : 'none'
+              maxWidth: isMobile ? '100%' : 'none',
+              marginLeft: isMobile ? 'auto' : 0,
+              marginRight: isMobile ? 'auto' : 0
             }}>
-              The Million Dollar Photo Masterclass
+              {isMobile ? (
+                <>
+                  The Million Dollar
+                  <br />
+                  Photo
+                  <br />
+                  Masterclass
+                </>
+              ) : (
+                'The Million Dollar Photo Masterclass'
+              )}
             </h1>
             <p style={{
               fontFamily: "'Playfair Display', serif",
-              fontSize: isMobile ? '0.98rem' : '1.04rem',
-              lineHeight: isMobile ? 1.8 : 1.9,
+              fontSize: isMobile ? '0.92rem' : '1.04rem',
+              lineHeight: isMobile ? 1.72 : 1.9,
               color: '#353535',
-              maxWidth: '650px',
-              marginBottom: '30px'
+              maxWidth: isMobile ? '31ch' : '650px',
+              marginBottom: isMobile ? '22px' : '30px',
+              marginLeft: isMobile ? 'auto' : 0,
+              marginRight: isMobile ? 'auto' : 0
             }}>
               A focused, high-standard private class for photographers who want magazine-level results, stronger direction, sharper lighting choices, and a more refined creative process.
             </p>
 
-            <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap', marginBottom: '34px' }}>
+            <div style={{ display: 'flex', gap: '14px', alignItems: 'center', justifyContent: isMobile ? 'center' : 'flex-start', flexWrap: 'wrap', marginBottom: isMobile ? '26px' : '34px' }}>
               <button
                 type="button"
                 onClick={scrollToApplication}
                 style={{
-                  padding: isMobile ? '16px 22px' : '17px 28px',
+                  padding: isMobile ? '15px 22px' : '17px 28px',
                   backgroundColor: '#000000',
                   color: '#ffffff',
                   border: 'none',
                   borderRadius: '999px',
                   fontFamily: "'Playfair Display', serif",
-                  fontSize: '0.78rem',
+                  fontSize: isMobile ? '0.74rem' : '0.78rem',
                   fontWeight: 700,
                   letterSpacing: '0.18em',
                   textTransform: 'uppercase',
@@ -225,7 +239,12 @@ export default function Academy() {
               >
                 Register Now
               </button>
-              <TextAction onClick={scrollToApplication}>
+              <TextAction
+                onClick={scrollToApplication}
+                style={{
+                  fontSize: isMobile ? '0.82rem' : '0.9rem'
+                }}
+              >
                 Go straight to application
               </TextAction>
             </div>
