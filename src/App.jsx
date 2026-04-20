@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 import SafeImage from './components/SafeImage';
 import { HOME_PORTFOLIO_IMAGES, STORIES_IMAGES, SERVICES_IMAGES } from './utils/images';
 import Portfolio from './pages/Portfolio';
@@ -130,6 +131,8 @@ function SoftMagneticImage({ src, alt, style, ...props }) {
 // Glassmorphic Navbar - Nearly transparent until hitting a section
 function GlassNavbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === '/';
 
@@ -140,6 +143,24 @@ function GlassNavbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const syncViewport = () => setIsMobile(window.innerWidth < 900);
+    syncViewport();
+    window.addEventListener('resize', syncViewport);
+    return () => window.removeEventListener('resize', syncViewport);
+  }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
 
   // On the home page: float over the iframe with blur always on.
   // On other pages: same treatment but scrolled state drives intensity.
@@ -165,7 +186,7 @@ function GlassNavbar() {
         left: 0,
         right: 0,
         zIndex: 1000,
-        padding: '28px 48px',
+        padding: isMobile ? '18px 18px' : '28px 48px',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         backgroundColor: onHero ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.72)',
@@ -180,57 +201,198 @@ function GlassNavbar() {
         maxWidth: '1600px',
         margin: '0 auto'
       }}>
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
-              fontWeight: 900,
-              color: textColor,
-              letterSpacing: '-0.03em',
-              lineHeight: 1,
-              transition: 'color 0.4s ease'
-            }}
-          >
-            THE LAGOS PAPARAZZI
-          </motion.div>
-        </Link>
-        <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap' }}>
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
-              style={{ textDecoration: 'none' }}
+        {isMobile ? (
+          <>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open navigation menu"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: textColor,
+                padding: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
             >
+              <Menu size={24} />
+            </button>
+
+            <Link to="/" style={{ textDecoration: 'none', flex: 1, display: 'flex', justifyContent: 'center' }}>
               <motion.div
-                whileHover={{ y: -2 }}
+                whileHover={{ scale: 1.02 }}
                 style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: '0.6875rem',
-                  fontWeight: 600,
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: '1.25rem',
+                  fontWeight: 900,
                   color: textColor,
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  transition: 'opacity 0.3s ease, color 0.4s ease',
-                  borderBottom: '1px solid transparent',
-                  paddingBottom: '4px'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.opacity = '0.6';
-                  e.currentTarget.style.borderBottomColor = textColor;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = '1';
-                  e.currentTarget.style.borderBottomColor = 'transparent';
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1,
+                  transition: 'color 0.4s ease',
+                  textAlign: 'center'
                 }}
               >
-                {item.label}
+                THE LAGOS PAPARAZZI
               </motion.div>
             </Link>
-          ))}
-        </div>
+
+            <div style={{ width: '40px' }} />
+
+            <AnimatePresence>
+              {menuOpen && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setMenuOpen(false)}
+                    style={{
+                      position: 'fixed',
+                      inset: 0,
+                      backgroundColor: 'rgba(0, 0, 0, 0.28)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      zIndex: 1100
+                    }}
+                  />
+                  <motion.aside
+                    initial={{ x: '-100%' }}
+                    animate={{ x: 0 }}
+                    exit={{ x: '-100%' }}
+                    transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+                    style={{
+                      position: 'fixed',
+                      top: 0,
+                      left: 0,
+                      bottom: 0,
+                      width: '82vw',
+                      maxWidth: '320px',
+                      backgroundColor: '#ffffff',
+                      padding: '24px 22px 32px',
+                      zIndex: 1101,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      boxShadow: '12px 0 50px rgba(0,0,0,0.12)'
+                    }}
+                  >
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '28px'
+                    }}>
+                      <div style={{
+                        fontFamily: "'Cormorant Garamond', serif",
+                        fontSize: '1.45rem',
+                        fontWeight: 800,
+                        color: '#000000'
+                      }}>
+                        Menu
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setMenuOpen(false)}
+                        aria-label="Close navigation menu"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#000000',
+                          padding: '6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <X size={22} />
+                      </button>
+                    </div>
+
+                    <nav style={{ display: 'grid', gap: '8px' }}>
+                      {navItems.map((item) => (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
+                          style={{
+                            textDecoration: 'none',
+                            color: '#000000',
+                            padding: '14px 0',
+                            borderBottom: '1px solid rgba(0,0,0,0.08)',
+                            fontFamily: "'Playfair Display', serif",
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            letterSpacing: '0.18em',
+                            textTransform: 'uppercase'
+                          }}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </nav>
+                  </motion.aside>
+                </>
+              )}
+            </AnimatePresence>
+          </>
+        ) : (
+          <>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
+                  fontWeight: 900,
+                  color: textColor,
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1,
+                  transition: 'color 0.4s ease'
+                }}
+              >
+                THE LAGOS PAPARAZZI
+              </motion.div>
+            </Link>
+            <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap' }}>
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <motion.div
+                    whileHover={{ y: -2 }}
+                    style={{
+                      fontFamily: "'Playfair Display', serif",
+                      fontSize: '0.6875rem',
+                      fontWeight: 600,
+                      color: textColor,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      transition: 'opacity 0.3s ease, color 0.4s ease',
+                      borderBottom: '1px solid transparent',
+                      paddingBottom: '4px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.opacity = '0.6';
+                      e.currentTarget.style.borderBottomColor = textColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.opacity = '1';
+                      e.currentTarget.style.borderBottomColor = 'transparent';
+                    }}
+                  >
+                    {item.label}
+                  </motion.div>
+                </Link>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </motion.nav>
   );
